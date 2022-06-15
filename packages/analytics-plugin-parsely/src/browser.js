@@ -82,14 +82,31 @@
 		});
 	  },
 
-	  identify: ({ payload: { userId, traits }, instance }) => {
-		fetch(`https://api.parsely.com/v2/profile?apikey=${window.location.host}&url=${window.location.href}&uuid=${userId}`)
+	  identify: ({ payload: { apiKey, userId, traits }, instance }) => {
+		fetch(`https://api.parsely.com/v2/profile?apikey=${apiKey}&url=${window.location.href}&uuid=${userId}`)
 		.then(response => response.json())
-		.then(data => console.log(data))
+		.then(data => data)
 		.catch((data) => {
 			console.log("Failure: ");
 			console.log(data);
 		})
+	  },
+
+	  user: ({payload: {apiKey, requiredData}}) => {
+		switch (requiredData) {
+			case 'history':
+				fetch(`https://api.parsely.com/v2/history?apikey=${apiKey}&uuid=${userId}`)
+				.then(response => response.json())
+				.then(data => data)
+				.catch((data) => {
+					console.log("Failure: ");
+					console.log(data);
+					return data;
+				})
+				break;
+			default:
+				return "No such data available";
+		}
 	  },
 
 	  loaded: () => parselyInitCompleted,
