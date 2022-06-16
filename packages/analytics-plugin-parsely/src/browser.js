@@ -30,7 +30,15 @@ function parselyPlugin(pluginConfig = {}) {
 		name: "parsely",
 		config: pluginConfig,
 		initialize: ({ config }) => {
-			const { apiKey, options = {} } = config
+			const { apiKey, options = {} } = config;
+
+			/**
+			 * As we are using wp-parsely plugin now. So here we are explicitly declaring parsely is already initialized.
+			 *
+			 * REMOVE THIS LINE WHEN INITIALIZING PARSELY USING THE BELOW SCRIPT.
+			 */
+			parselyInitCompleted = true;
+
 			if (!apiKey) {
 				throw new Error("Parsely project API key is not defined")
 			}
@@ -77,10 +85,12 @@ function parselyPlugin(pluginConfig = {}) {
 		},
 
 		identify: ({payload}) => {
-			let {apiKey, userId} = payload.traits;
-			fetch(`https://api.parsely.com/v2/profile?apikey=${apiKey}&url=${window.location.href}}&uuid=${userId}`)
+			let {apiKey} = payload.traits;
+			fetch(`https://api.parsely.com/v2/profile?apikey=${apiKey}&url=${window.location.href}}&uuid=${payload.userId}`)
 			.then(response => response.json())
-			.then(data => data)
+			.then(data => {
+				return data;
+			})
 			.catch((data) => {
 				console.log("Failure: ");
 				console.log(data);
